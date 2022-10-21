@@ -8,6 +8,8 @@ fn main() {
     println!("255");
 
     for i in (0..height).rev() {
+        eprint!("\rScanlines remaining: {} ", i);
+
         for j in 0..width {
             let r = j as f64 / (width - 1) as f64;
             let g = i as f64 / (height - 1) as f64;
@@ -20,4 +22,6 @@ fn main() {
             println!("{} {} {}", ir, ig, ib)
         }
     }
+
+    eprintln!("\nDone.");
 }
