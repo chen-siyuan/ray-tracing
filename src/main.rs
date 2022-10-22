@@ -1,41 +1,33 @@
 mod color;
+mod hittable;
 mod point3;
 mod ray;
+mod sphere;
 mod vec3;
 
 use crate::color::{write_color, Color};
+use crate::hittable::{HitRecord, Hittable};
 use crate::point3::Point3;
 use crate::ray::Ray;
+use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 
-fn hit_sphere(center: Point3, radius: f64, ray: &Ray) -> Option<Point3> {
-    let co = ray.origin - center;
-    let a = ray.direction * ray.direction;
-    let half_b = co * ray.direction;
-    let c = co * co - radius * radius;
-    let determinant = half_b * half_b - a * c;
-    if determinant < 0. {
-        None
-    } else {
-        let t = (-half_b - f64::sqrt(determinant)) / a;
-        Some(ray.at(t))
-    }
-}
+const SPHERE: Sphere = Sphere {
+    center: Point3(0., 0., -1.),
+    radius: 0.5,
+};
 
 fn ray_color(ray: &Ray) -> Color {
-    let center = Point3(0., 0., -1.);
-    let radius = 0.5;
-
-    match hit_sphere(center, radius, ray) {
-        Some(intersection) => {
-            let normal = intersection - center;
-            let unit_normal = normal.normalize();
-            (unit_normal + Vec3(1., 1., 1.)) / 2.
-        }
+    match SPHERE.hit(ray, f64::MIN, f64::MAX) {
         None => {
             let unit_direction = ray.direction.normalize();
             Color(1.0, 1.0, 1.0).interpolate(Color(0.5, 0.7, 1.0), (-unit_direction.0 + 1.) / 2.)
         }
+        Some(HitRecord {
+            t: _,
+            point: _,
+            normal,
+        }) => (normal + Vec3(1., 1., 1.)) / 2.,
     }
 }
 
