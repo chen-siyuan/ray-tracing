@@ -14,20 +14,20 @@ pub trait Hittable {
 }
 
 impl HitRecord {
-    pub fn new(ray: &Ray, t: f64, point: Point3, outward_normal: Vec3) -> Self {
-        if ray.direction * outward_normal < 0. {
+    pub fn new(ray: &Ray, t: f64, point: &Point3, outward_normal: &Vec3) -> Self {
+        if ray.direction * *outward_normal < 0. {
             HitRecord {
                 t,
-                point,
+                point: *point,
                 front_face: true,
-                normal: outward_normal,
+                normal: *outward_normal,
             }
         } else {
             HitRecord {
                 t,
-                point,
+                point: *point,
                 front_face: false,
-                normal: -outward_normal,
+                normal: -*outward_normal,
             }
         }
     }

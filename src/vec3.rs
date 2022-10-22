@@ -17,6 +17,14 @@ impl std::ops::Add for Vec3 {
     }
 }
 
+impl std::ops::AddAssign for Vec3 {
+    fn add_assign(&mut self, rhs: Self) {
+        self.0 += rhs.0;
+        self.1 += rhs.1;
+        self.2 += rhs.2;
+    }
+}
+
 impl std::ops::Sub for Vec3 {
     type Output = Self;
 
@@ -41,6 +49,14 @@ impl std::ops::Mul<Vec3> for Vec3 {
     }
 }
 
+impl std::ops::MulAssign<f64> for Vec3 {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.0 *= rhs;
+        self.1 *= rhs;
+        self.2 *= rhs;
+    }
+}
+
 impl std::ops::Div<f64> for Vec3 {
     type Output = Vec3;
 
@@ -49,12 +65,18 @@ impl std::ops::Div<f64> for Vec3 {
     }
 }
 
+impl std::ops::DivAssign<f64> for Vec3 {
+    fn div_assign(&mut self, rhs: f64) {
+        *self *= 1. / rhs;
+    }
+}
+
 impl Vec3 {
-    pub fn magnitude(self) -> f64 {
-        f64::sqrt(self * self)
+    pub fn magnitude(&self) -> f64 {
+        f64::sqrt(*self * *self)
     }
 
-    pub fn normalize(self) -> Self {
-        self / self.magnitude()
+    pub fn normalize(&self) -> Self {
+        *self / self.magnitude()
     }
 }

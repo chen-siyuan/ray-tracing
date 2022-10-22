@@ -13,7 +13,15 @@ pub fn write_color(color: &Color) -> () {
 }
 
 impl Color {
-    pub fn interpolate(self, other: Color, k: f64) -> Color {
-        (1. - k) * self + k * other
+    pub fn interpolate(&self, other: &Color, k: f64) -> Color {
+        (1. - k) * *self + k * *other
+    }
+
+    pub fn clamp(&self) -> Color {
+        Color(
+            f64::clamp(self.0, 0., 1.),
+            f64::clamp(self.1, 0., 1.),
+            f64::clamp(self.2, 0., 1.),
+        )
     }
 }
