@@ -33,6 +33,14 @@ impl std::ops::Mul<Vec3> for f64 {
     }
 }
 
+impl std::ops::Mul<Vec3> for Vec3 {
+    type Output = f64;
+
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
+    }
+}
+
 impl std::ops::Div<f64> for Vec3 {
     type Output = Vec3;
 
@@ -42,8 +50,8 @@ impl std::ops::Div<f64> for Vec3 {
 }
 
 impl Vec3 {
-    pub fn magnitude(&self) -> f64 {
-        f64::sqrt(self.0 * self.0 + self.1 * self.1 + self.2 * self.2)
+    pub fn magnitude(self) -> f64 {
+        f64::sqrt(self * self)
     }
 
     pub fn normalize(self) -> Self {

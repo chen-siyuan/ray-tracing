@@ -8,7 +8,19 @@ use crate::point3::Point3;
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 
+fn hit_sphere(center: Point3, radius: f64, ray: &Ray) -> bool {
+    let co = ray.origin - center;
+    let a = ray.direction * ray.direction;
+    let b = 2. * co * ray.direction;
+    let c = co * co - radius * radius;
+    let determinant = b * b - 4. * a * c;
+    determinant > 0.
+}
+
 fn ray_color(r: &Ray) -> Color {
+    if hit_sphere(Point3(0., 0., -1.), 0.5, r) {
+        return Color(1.0, 0., 0.);
+    }
     let unit_direction = r.direction.normalize();
     Color(1.0, 1.0, 1.0).interpolate(Color(0.5, 0.7, 1.0), (-unit_direction.0 + 1.) / 2.)
 }
@@ -37,7 +49,7 @@ fn main() {
             let u = i as f64 / (image_height - 1) as f64;
             let v = j as f64 / (image_width - 1) as f64;
             let r = Ray {
-                origin: origin,
+                origin,
                 direction: -origin + upper_left_corner + u * vertical + v * horizontal,
             };
             let c = ray_color(&r);
