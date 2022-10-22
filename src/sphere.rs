@@ -26,7 +26,7 @@ impl Hittable for Sphere {
             }
         }
         let point = ray.at(t);
-        let normal = (point - self.center) / self.radius;
-        Some(HitRecord { t, point, normal })
+        let outward_normal = (point - self.center) / self.radius;
+        Some(HitRecord::new(ray, t, point, outward_normal))
     }
 }

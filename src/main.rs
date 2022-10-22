@@ -26,6 +26,7 @@ fn ray_color(ray: &Ray) -> Color {
         Some(HitRecord {
             t: _,
             point: _,
+            front_face: _,
             normal,
         }) => (normal + Vec3(1., 1., 1.)) / 2.,
     }
