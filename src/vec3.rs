@@ -80,6 +80,10 @@ impl Vec3 {
         *self / self.magnitude()
     }
 
+    pub fn interpolate(&self, other: &Vec3, k: f64) -> Vec3 {
+        (1. - k) * *self + k * *other
+    }
+
     pub fn random(min: f64, max: f64) -> Self {
         Vec3(
             min + rand::random::<f64>() * (max - min),
@@ -99,5 +103,14 @@ impl Vec3 {
 
     pub fn random_unit_vector() -> Self {
         Self::random_in_unit_sphere().normalize()
+    }
+
+    pub fn random_in_hemisphere(normal: &Self) -> Self {
+        let v = Self::random_in_unit_sphere();
+        if v * *normal > 0. {
+            v
+        } else {
+            -v
+        }
     }
 }

@@ -10,7 +10,7 @@ mod sphere;
 mod vec3;
 
 use crate::camera::Camera;
-use crate::color::{write_color, Color};
+use crate::color::Color;
 use crate::hittable::{HitRecord, Hittable};
 use crate::hittable_list::HittableList;
 use crate::point3::Point3;
@@ -32,7 +32,7 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
             front_face: _,
             normal,
         }) => {
-            let target = point + normal + Vec3::random_unit_vector();
+            let target = point + Vec3::random_in_hemisphere(&normal);
             0.5 * ray_color(
                 &Ray {
                     origin: point,
@@ -47,6 +47,22 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
             Color(1.0, 1.0, 1.0).interpolate(&Color(0.5, 0.7, 1.0), (-unit_direction.0 + 1.) / 2.)
         }
     }
+}
+
+pub fn write_color(color: &Color) -> () {
+    const MAX_COLOR: f64 = 255.999;
+
+    let Color(r, g, b) = color;
+
+    let r = f64::sqrt(r.clamp(0., 1.));
+    let g = f64::sqrt(g.clamp(0., 1.));
+    let b = f64::sqrt(b.clamp(0., 1.));
+
+    let ir = (MAX_COLOR * r).floor() as i32;
+    let ig = (MAX_COLOR * g).floor() as i32;
+    let ib = (MAX_COLOR * b).floor() as i32;
+
+    println!("{} {} {}", ir, ig, ib);
 }
 
 fn main() {
@@ -87,7 +103,7 @@ fn main() {
                 color += ray_color(&ray, &world, MAX_DEPTH);
             }
             color /= SAMPLES_PER_PIXEL as f64;
-            write_color(&color.clamp());
+            write_color(&color);
         }
     }
     eprintln!("\rLines remaining: {} ", 0);
