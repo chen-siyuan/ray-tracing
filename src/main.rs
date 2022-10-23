@@ -32,7 +32,7 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
             front_face: _,
             normal,
         }) => {
-            let target = point + normal + Vec3::random_in_unit_sphere();
+            let target = point + normal + Vec3::random_unit_vector();
             0.5 * ray_color(
                 &Ray {
                     origin: point,
