@@ -1,5 +1,7 @@
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub struct Vec3(pub f64, pub f64, pub f64);
+pub use Vec3 as Point3;
+pub use Vec3 as Color;
 
 impl std::ops::Neg for Vec3 {
     type Output = Self;

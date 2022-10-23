@@ -1,22 +1,18 @@
 extern crate rand;
 
 mod camera;
-mod color;
 mod hittable;
 mod hittable_list;
-mod point3;
 mod ray;
 mod sphere;
 mod vec3;
 
 use crate::camera::Camera;
-use crate::color::Color;
 use crate::hittable::{HitRecord, Hittable};
 use crate::hittable_list::HittableList;
-use crate::point3::Point3;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
-use crate::vec3::Vec3;
+use crate::vec3::{Color, Point3, Vec3};
 
 fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     const EPSILON: f64 = 0.001;
@@ -113,9 +109,8 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use crate::point3::Point3;
     use crate::ray::Ray;
-    use crate::vec3::Vec3;
+    use crate::vec3::{Point3, Vec3};
 
     #[test]
     fn vec_arithmetic() -> () {
