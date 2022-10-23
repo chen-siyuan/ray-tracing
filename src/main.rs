@@ -18,14 +18,27 @@ use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 
-fn ray_color(ray: &Ray, world: &HittableList) -> Color {
+fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
+    if depth == 0 {
+        return Color(0., 0., 0.);
+    }
     match world.hit(ray, 0., f64::MAX) {
         Some(HitRecord {
             t: _,
-            point: _,
+            point,
             front_face: _,
             normal,
-        }) => (normal + Vec3(1., 1., 1.)) / 2.,
+        }) => {
+            let target = point + normal + Vec3::random_in_unit_sphere();
+            0.5 * ray_color(
+                &Ray {
+                    origin: point,
+                    direction: target - point,
+                },
+                world,
+                depth - 1,
+            )
+        }
         None => {
             let unit_direction = ray.direction.normalize();
             Color(1.0, 1.0, 1.0).interpolate(&Color(0.5, 0.7, 1.0), (-unit_direction.0 + 1.) / 2.)
@@ -35,14 +48,13 @@ fn ray_color(ray: &Ray, world: &HittableList) -> Color {
 
 fn main() {
     // Image
-
     let aspect_ratio = 16. / 9.;
     let image_height = 400;
     let image_width = (aspect_ratio * image_height as f64) as i32;
     let samples_per_pixel = 100;
+    let max_depth = 50;
 
     // World
-
     let mut world = HittableList { objects: vec![] };
     world.objects.push(&Sphere {
         center: Point3(0., 0., -1.),
@@ -54,11 +66,9 @@ fn main() {
     });
 
     // Camera
-
     let camera = Camera::new();
 
     // Render
-
     println!("P3");
     println!("{} {}", image_width, image_height);
     println!("255");
@@ -71,7 +81,7 @@ fn main() {
                 let u = (i as f64 + rand::random::<f64>()) / image_height as f64;
                 let v = (j as f64 + rand::random::<f64>()) / image_width as f64;
                 let ray = camera.get_ray(u, v);
-                color += ray_color(&ray, &world);
+                color += ray_color(&ray, &world, max_depth);
             }
             color /= samples_per_pixel as f64;
             write_color(&color.clamp());

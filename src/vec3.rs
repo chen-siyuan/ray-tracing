@@ -79,4 +79,21 @@ impl Vec3 {
     pub fn normalize(&self) -> Self {
         *self / self.magnitude()
     }
+
+    pub fn random(min: f64, max: f64) -> Self {
+        Vec3(
+            min + rand::random::<f64>() * (max - min),
+            min + rand::random::<f64>() * (max - min),
+            min + rand::random::<f64>() * (max - min),
+        )
+    }
+
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let v = Self::random(-1., 1.);
+            if v * v <= 1. {
+                break v;
+            }
+        }
+    }
 }
