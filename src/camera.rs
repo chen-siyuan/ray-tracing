@@ -11,16 +11,16 @@ pub struct Camera {
 
 impl Camera {
     pub fn new() -> Self {
-        let aspect_ratio = 16. / 9.;
-        let viewport_height = 2.;
-        let viewport_width = aspect_ratio * viewport_height;
-        let focal_length = 1.;
+        const ASPECT_RATIO: f64 = 16. / 9.;
+        const VIEWPORT_HEIGHT: f64 = 2.;
+        const VIEWPORT_WIDTH: f64 = ASPECT_RATIO * VIEWPORT_HEIGHT;
+        const FOCAL_LENGTH: f64 = 1.;
 
         let origin = Point3(0., 0., 0.);
-        let vertical = Vec3(viewport_height, 0., 0.);
-        let horizontal = Vec3(0., viewport_width, 0.);
+        let vertical = Vec3(VIEWPORT_HEIGHT, 0., 0.);
+        let horizontal = Vec3(0., VIEWPORT_WIDTH, 0.);
         let upper_left_corner =
-            origin + Vec3(0., 0., -focal_length) - vertical / 2. - horizontal / 2.;
+            origin + Vec3(0., 0., -FOCAL_LENGTH) - vertical / 2. - horizontal / 2.;
         Camera {
             origin,
             upper_left_corner,

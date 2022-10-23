@@ -19,10 +19,13 @@ use crate::sphere::Sphere;
 use crate::vec3::Vec3;
 
 fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
+    const EPSILON: f64 = 0.001;
+    const INFINITY: f64 = f64::MAX;
+
     if depth == 0 {
         return Color(0., 0., 0.);
     }
-    match world.hit(ray, 0., f64::MAX) {
+    match world.hit(ray, EPSILON, INFINITY) {
         Some(HitRecord {
             t: _,
             point,
@@ -48,11 +51,11 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
 
 fn main() {
     // Image
-    let aspect_ratio = 16. / 9.;
-    let image_height = 400;
-    let image_width = (aspect_ratio * image_height as f64) as i32;
-    let samples_per_pixel = 100;
-    let max_depth = 50;
+    const ASPECT_RATIO: f64 = 16. / 9.;
+    const IMAGE_HEIGHT: i32 = 400;
+    const IMAGE_WIDTH: i32 = (ASPECT_RATIO * IMAGE_HEIGHT as f64) as i32;
+    const SAMPLES_PER_PIXEL: i32 = 100;
+    const MAX_DEPTH: i32 = 50;
 
     // World
     let mut world = HittableList { objects: vec![] };
@@ -70,20 +73,20 @@ fn main() {
 
     // Render
     println!("P3");
-    println!("{} {}", image_width, image_height);
+    println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
     println!("255");
 
-    for i in 0..image_height {
-        eprint!("\rLines remaining: {} ", image_height - i);
-        for j in 0..image_width {
+    for i in 0..IMAGE_HEIGHT {
+        eprint!("\rLines remaining: {} ", IMAGE_HEIGHT - i);
+        for j in 0..IMAGE_WIDTH {
             let mut color = Color(0., 0., 0.);
-            for _ in 0..samples_per_pixel {
-                let u = (i as f64 + rand::random::<f64>()) / image_height as f64;
-                let v = (j as f64 + rand::random::<f64>()) / image_width as f64;
+            for _ in 0..SAMPLES_PER_PIXEL {
+                let u = (i as f64 + rand::random::<f64>()) / IMAGE_HEIGHT as f64;
+                let v = (j as f64 + rand::random::<f64>()) / IMAGE_WIDTH as f64;
                 let ray = camera.get_ray(u, v);
-                color += ray_color(&ray, &world, max_depth);
+                color += ray_color(&ray, &world, MAX_DEPTH);
             }
-            color /= samples_per_pixel as f64;
+            color /= SAMPLES_PER_PIXEL as f64;
             write_color(&color.clamp());
         }
     }
