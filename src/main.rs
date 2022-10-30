@@ -71,14 +71,14 @@ fn main() {
 
     // World
     let mut world = HittableList { objects: vec![] };
-    world.objects.push(&Sphere {
+    world.objects.push(Box::new(Sphere {
         center: Point3(0., 0., -1.),
         radius: 0.5,
-    });
-    world.objects.push(&Sphere {
+    }));
+    world.objects.push(Box::new(Sphere {
         center: Point3(100.5, 0., -1.),
         radius: 100.,
-    });
+    }));
 
     // Camera
     let camera = Camera::new();

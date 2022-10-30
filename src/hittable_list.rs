@@ -1,11 +1,11 @@
 use crate::hittable::{HitRecord, Hittable};
 use crate::ray::Ray;
 
-pub struct HittableList<'a> {
-    pub objects: Vec<&'a dyn Hittable>,
+pub struct HittableList {
+    pub objects: Vec<Box<dyn Hittable>>,
 }
 
-impl<'a> Hittable for HittableList<'a> {
+impl Hittable for HittableList {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let mut t_curr = t_max;
         let mut res = None;
