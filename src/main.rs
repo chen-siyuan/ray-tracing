@@ -2,17 +2,11 @@ extern crate rand;
 
 mod camera;
 mod hittable;
-mod hittable_list;
-mod ray;
-mod sphere;
 mod vec3;
 
 use crate::camera::Camera;
-use crate::hittable::{HitRecord, Hittable};
-use crate::hittable_list::HittableList;
-use crate::ray::Ray;
-use crate::sphere::Sphere;
-use crate::vec3::{Color, Point3, Vec3};
+use crate::hittable::{HitRecord, HittableList, Sphere, Hittable};
+use crate::vec3::{Color, Point3, Vec3, Ray};
 
 fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     const EPSILON: f64 = 0.001;
