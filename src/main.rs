@@ -1,12 +1,14 @@
 extern crate rand;
 
+use crate::camera::Camera;
+use crate::hittable::{Hittable, HittableList, Sphere};
+use crate::material::{Lambertian, Metal};
+use crate::vec3::{Color, Point3, Ray};
+
 mod camera;
 mod hittable;
+mod material;
 mod vec3;
-
-use crate::camera::Camera;
-use crate::hittable::{HitRecord, HittableList, Sphere, Hittable};
-use crate::vec3::{Color, Point3, Vec3, Ray};
 
 fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     const EPSILON: f64 = 0.001;
@@ -16,25 +18,15 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
         return Color(0., 0., 0.);
     }
     match world.hit(ray, EPSILON, INFINITY) {
-        Some(HitRecord {
-            t: _,
-            point,
-            front_face: _,
-            normal,
-        }) => {
-            let target = point + Vec3::random_in_hemisphere(&normal);
-            0.5 * ray_color(
-                &Ray {
-                    origin: point,
-                    direction: target - point,
-                },
-                world,
-                depth - 1,
-            )
-        }
+        Some(record) => match record.material.scatter(ray, &record) {
+            Some((attenuation, scattered)) => {
+                attenuation.mul(ray_color(&scattered, world, depth - 1))
+            }
+            None => Color(0., 0., 0.),
+        },
         None => {
             let unit_direction = ray.direction.normalize();
-            Color(1.0, 1.0, 1.0).interpolate(&Color(0.5, 0.7, 1.0), (-unit_direction.0 + 1.) / 2.)
+            Color(1., 1., 1.).interpolate(Color(0.5, 0.7, 1.), (-unit_direction.0 + 1.) / 2.)
         }
     }
 }
@@ -66,12 +58,32 @@ fn main() {
     // World
     let mut world = HittableList { objects: vec![] };
     world.objects.push(Box::new(Sphere {
-        center: Point3(0., 0., -1.),
-        radius: 0.5,
-    }));
-    world.objects.push(Box::new(Sphere {
         center: Point3(100.5, 0., -1.),
         radius: 100.,
+        material: Box::new(Lambertian {
+            albedo: Color(0.8, 0.8, 0.),
+        }),
+    }));
+    world.objects.push(Box::new(Sphere {
+        center: Point3(0., 0., -1.),
+        radius: 0.5,
+        material: Box::new(Lambertian {
+            albedo: Color(0.7, 0.3, 0.3),
+        }),
+    }));
+    world.objects.push(Box::new(Sphere {
+        center: Point3(0., -1., -1.),
+        radius: 0.5,
+        material: Box::new(Metal {
+            albedo: Color(0.8, 0.8, 0.8),
+        }),
+    }));
+    world.objects.push(Box::new(Sphere {
+        center: Point3(0., 1., -1.),
+        radius: 0.5,
+        material: Box::new(Metal {
+            albedo: Color(0.8, 0.6, 0.2),
+        }),
     }));
 
     // Camera
@@ -103,8 +115,7 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use crate::ray::Ray;
-    use crate::vec3::{Point3, Vec3};
+    use crate::vec3::{Point3, Ray, Vec3};
 
     #[test]
     fn vec_arithmetic() -> () {

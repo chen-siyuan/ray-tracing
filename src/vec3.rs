@@ -74,16 +74,29 @@ impl std::ops::DivAssign<f64> for Vec3 {
 }
 
 impl Vec3 {
-    pub fn magnitude(&self) -> f64 {
-        f64::sqrt(*self * *self)
+    pub fn near_zero(self) -> bool {
+        const EPSILON: f64 = 1e-8;
+        self.0.abs() < EPSILON && self.1.abs() < EPSILON && self.2.abs() < EPSILON
     }
 
-    pub fn normalize(&self) -> Self {
-        *self / self.magnitude()
+    pub fn magnitude(self) -> f64 {
+        f64::sqrt(self * self)
     }
 
-    pub fn interpolate(&self, other: &Vec3, k: f64) -> Vec3 {
-        (1. - k) * *self + k * *other
+    pub fn normalize(self) -> Self {
+        self / self.magnitude()
+    }
+
+    pub fn interpolate(self, other: Vec3, k: f64) -> Vec3 {
+        (1. - k) * self + k * other
+    }
+
+    pub fn mul(self, other: Vec3) -> Vec3 {
+        Self(self.0 * other.0, self.1 * other.1, self.2 * other.2)
+    }
+
+    pub fn reflect(self, normal: Vec3) -> Vec3 {
+        self - 2. * (self * normal) * normal
     }
 
     pub fn random(min: f64, max: f64) -> Self {
@@ -104,12 +117,17 @@ impl Vec3 {
     }
 
     pub fn random_unit_vector() -> Self {
-        Self::random_in_unit_sphere().normalize()
+        loop {
+            let v = Self::random_in_unit_sphere();
+            if v * v != 0. {
+                break v.normalize();
+            }
+        }
     }
 
-    pub fn random_in_hemisphere(normal: &Self) -> Self {
+    pub fn random_in_hemisphere(normal: Self) -> Self {
         let v = Self::random_in_unit_sphere();
-        if v * *normal > 0. {
+        if v * normal > 0. {
             v
         } else {
             -v

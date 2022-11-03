@@ -1,27 +1,37 @@
-use crate::vec3::{Point3, Vec3, Ray};
+use crate::material::Material;
+use crate::vec3::{Point3, Ray, Vec3};
 
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub t: f64,
     pub point: Point3,
     pub front_face: bool,
     pub normal: Vec3,
+    pub material: &'a dyn Material,
 }
 
-impl HitRecord {
-    pub fn new(ray: &Ray, t: f64, point: &Point3, outward_normal: &Vec3) -> Self {
-        if ray.direction * *outward_normal < 0. {
+impl<'a> HitRecord<'a> {
+    pub fn new(
+        ray: &Ray,
+        t: f64,
+        point: Point3,
+        outward_normal: Vec3,
+        material: &'a dyn Material,
+    ) -> Self {
+        if ray.direction * outward_normal < 0. {
             HitRecord {
                 t,
-                point: *point,
+                point,
                 front_face: true,
-                normal: *outward_normal,
+                normal: outward_normal,
+                material,
             }
         } else {
             HitRecord {
                 t,
-                point: *point,
+                point,
                 front_face: false,
-                normal: -*outward_normal,
+                normal: -outward_normal,
+                material,
             }
         }
     }
@@ -52,6 +62,7 @@ impl Hittable for HittableList {
 pub struct Sphere {
     pub center: Point3,
     pub radius: f64,
+    pub material: Box<dyn Material>,
 }
 
 impl Hittable for Sphere {
@@ -74,6 +85,12 @@ impl Hittable for Sphere {
         }
         let point = ray.at(t);
         let outward_normal = (point - self.center) / self.radius;
-        Some(HitRecord::new(ray, t, &point, &outward_normal))
+        Some(HitRecord::new(
+            ray,
+            t,
+            point,
+            outward_normal,
+            &*self.material,
+        ))
     }
 }
