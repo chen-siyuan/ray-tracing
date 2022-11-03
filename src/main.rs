@@ -76,6 +76,7 @@ fn main() {
         radius: 0.5,
         material: Box::new(Metal {
             albedo: Color(0.8, 0.8, 0.8),
+            fuzz: 0.3,
         }),
     }));
     world.objects.push(Box::new(Sphere {
@@ -83,6 +84,7 @@ fn main() {
         radius: 0.5,
         material: Box::new(Metal {
             albedo: Color(0.8, 0.6, 0.2),
+            fuzz: 1.,
         }),
     }));
 
