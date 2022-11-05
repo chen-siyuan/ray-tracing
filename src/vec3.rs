@@ -142,6 +142,16 @@ impl Vec3 {
         }
     }
 
+    pub fn random_in_unit_disk() -> Self {
+        loop {
+            let mut v = Self::random(-1., 1.);
+            v.2 = 0.;
+            if v * v <= 1. {
+                break v;
+            }
+        }
+    }
+
     pub fn random_unit_vector() -> Self {
         loop {
             let v = Self::random_in_unit_sphere();

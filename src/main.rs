@@ -106,13 +106,12 @@ fn main() {
     };
 
     // Camera
-    let camera = Camera::new(
-        Point3(-2., 2., 1.),
-        Point3(0., 0., -1.),
-        Vec3(0., 1., 0.),
-        20.,
-        ASPECT_RATIO,
-    );
+    let from = Point3(3., 3., 2.);
+    let at = Point3(0., 0., -1.);
+    let vup = Vec3(0., 1., 0.);
+    let aperture = 2.;
+    let dist_to_focus = (from - at).magnitude();
+    let camera = Camera::new(from, at, vup, 20., ASPECT_RATIO, aperture, dist_to_focus);
 
     // Render
     println!("P3");
@@ -140,10 +139,6 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use crate::camera::Camera;
-    use crate::hittable::{HittableList, Sphere};
-    use crate::material::Dielectric;
-    use crate::ray_color;
     use crate::vec3::{Point3, Ray, Vec3};
 
     #[test]
@@ -199,26 +194,5 @@ mod tests {
             .unwrap()
             .normalize()
             .near(Vec3(1., -f64::sqrt(3.), 0.).normalize()));
-    }
-
-    #[test]
-    fn refract_sphere() -> () {
-        let camera = Camera::new(
-            Point3(0., 0., 0.),
-            Point3(0., 0., -1.),
-            Vec3(0., 1., 0.),
-            90.,
-            16. / 9.,
-        );
-        let ray = camera.get_ray(0.5, 0.5);
-        let sphere = Sphere {
-            center: Point3(0., 0., -2.),
-            radius: 0.5,
-            material: Box::new(Dielectric { ir: 1.5 }),
-        };
-        let world = HittableList {
-            objects: vec![Box::new(sphere)],
-        };
-        ray_color(&ray, &world, 50);
     }
 }
