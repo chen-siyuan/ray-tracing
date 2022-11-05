@@ -3,7 +3,7 @@ extern crate rand;
 use crate::camera::Camera;
 use crate::hittable::{Hittable, HittableList, Sphere};
 use crate::material::{Dielectric, Lambertian, Metal};
-use crate::vec3::{Color, Point3, Ray, Vec3};
+use crate::vec3::{Color, Ray, Vec3};
 
 mod camera;
 mod hittable;
@@ -70,27 +70,27 @@ fn main() {
     };
 
     let sphere_ground = Sphere {
-        center: Point3(0., -100.5, -1.),
+        center: Vec3(0., -100.5, -1.),
         radius: 100.,
         material: Box::new(material_ground),
     };
     let sphere_center = Sphere {
-        center: Point3(0.0, 0.0, -1.0),
+        center: Vec3(0.0, 0.0, -1.0),
         radius: 0.5,
         material: Box::new(material_center),
     };
     let sphere_left = Sphere {
-        center: Point3(-1.0, 0.0, -1.0),
+        center: Vec3(-1.0, 0.0, -1.0),
         radius: 0.5,
         material: Box::new(material_left),
     };
     let sphere_left_hollow = Sphere {
-        center: Point3(-1.0, 0.0, -1.0),
+        center: Vec3(-1.0, 0.0, -1.0),
         radius: -0.45,
         material: Box::new(material_left_hollow),
     };
     let sphere_right = Sphere {
-        center: Point3(1.0, 0.0, -1.0),
+        center: Vec3(1.0, 0.0, -1.0),
         radius: 0.5,
         material: Box::new(material_right),
     };
@@ -106,8 +106,8 @@ fn main() {
     };
 
     // Camera
-    let from = Point3(3., 3., 2.);
-    let at = Point3(0., 0., -1.);
+    let from = Vec3(3., 3., 2.);
+    let at = Vec3(0., 0., -1.);
     let vup = Vec3(0., 1., 0.);
     let aperture = 2.;
     let dist_to_focus = (from - at).magnitude();
@@ -139,7 +139,7 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use crate::vec3::{Point3, Ray, Vec3};
+    use crate::vec3::{Ray, Vec3};
 
     #[test]
     fn vec_arithmetic() -> () {
@@ -160,7 +160,7 @@ mod tests {
 
     #[test]
     fn ray_at() -> () {
-        let p = Point3(1., 2., 3.);
+        let p = Vec3(1., 2., 3.);
         let v = Vec3(-4., -5., -6.);
         let r = Ray {
             origin: p,
@@ -168,7 +168,7 @@ mod tests {
         };
         let t = 1.;
 
-        let expected = Point3(-3., -3., -3.);
+        let expected = Vec3(-3., -3., -3.);
         let actual = r.at(t);
 
         assert_eq!(expected, actual);

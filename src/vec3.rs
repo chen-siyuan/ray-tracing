@@ -1,7 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub struct Vec3(pub f64, pub f64, pub f64);
 use crate::material::Dielectric;
-pub use Vec3 as Point3;
 pub use Vec3 as Color;
 
 impl std::ops::Neg for Vec3 {
@@ -172,12 +171,12 @@ impl Vec3 {
 }
 
 pub struct Ray {
-    pub origin: Point3,
+    pub origin: Vec3,
     pub direction: Vec3,
 }
 
 impl Ray {
-    pub fn at(&self, t: f64) -> Point3 {
+    pub fn at(&self, t: f64) -> Vec3 {
         return self.origin + t * self.direction;
     }
 }

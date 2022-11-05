@@ -1,9 +1,9 @@
 use crate::material::Material;
-use crate::vec3::{Point3, Ray, Vec3};
+use crate::vec3::{Ray, Vec3};
 
 pub struct HitRecord<'a> {
     pub t: f64,
-    pub point: Point3,
+    pub point: Vec3,
     pub front_face: bool,
     pub normal: Vec3,
     pub material: &'a dyn Material,
@@ -13,7 +13,7 @@ impl<'a> HitRecord<'a> {
     pub fn new(
         ray: &Ray,
         t: f64,
-        point: Point3,
+        point: Vec3,
         outward_normal: Vec3,
         material: &'a dyn Material,
     ) -> Self {
@@ -60,7 +60,7 @@ impl Hittable for HittableList {
 }
 
 pub struct Sphere {
-    pub center: Point3,
+    pub center: Vec3,
     pub radius: f64,
     pub material: Box<dyn Material>,
 }
