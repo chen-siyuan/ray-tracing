@@ -51,6 +51,13 @@ pub struct Dielectric {
     pub ir: f64,
 }
 
+impl Dielectric {
+    pub fn reflectance(cos_theta: f64, ratio: f64) -> f64 {
+        let r0 = f64::powi((1. - ratio) / (1. + ratio), 2);
+        r0 + (1. - r0) * f64::powi(1. - cos_theta, 5)
+    }
+}
+
 impl Material for Dielectric {
     fn scatter(&self, ray: &Ray, record: &HitRecord) -> Option<(Color, Ray)> {
         let unit_direction = ray.direction.normalize();

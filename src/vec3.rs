@@ -1,5 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub struct Vec3(pub f64, pub f64, pub f64);
+use crate::material::Dielectric;
 pub use Vec3 as Point3;
 pub use Vec3 as Color;
 
@@ -106,7 +107,7 @@ impl Vec3 {
     pub fn refract(self, normal: Vec3, ratio: f64) -> Option<Vec3> {
         let cos_theta = -self * normal;
         let sin_theta = f64::sqrt(1. - cos_theta * cos_theta);
-        match ratio * sin_theta > 1. {
+        match ratio * sin_theta > 1. || Dielectric::reflectance(cos_theta, ratio) > rand::random() {
             true => None,
             false => {
                 let perpendicular = ratio * (self + cos_theta * normal);

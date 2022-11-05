@@ -75,6 +75,11 @@ fn main() {
         radius: 0.5,
         material: Box::new(Dielectric { ir: 1.5 }),
     };
+    let sphere_left_hollow = Sphere {
+        center: Point3(-1., 0., -1.),
+        radius: -0.4,
+        material: Box::new(Dielectric { ir: 1.5 }),
+    };
     let sphere_right = Sphere {
         center: Point3(1., 0., -1.),
         radius: 0.5,
@@ -88,6 +93,7 @@ fn main() {
             Box::new(sphere_ground),
             Box::new(sphere_center),
             Box::new(sphere_left),
+            Box::new(sphere_left_hollow),
             Box::new(sphere_right),
         ],
     };
