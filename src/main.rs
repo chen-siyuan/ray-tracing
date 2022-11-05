@@ -57,7 +57,7 @@ fn main() {
 
     // World
     let sphere_ground = Sphere {
-        center: Point3(100.5, 0., -1.),
+        center: Point3(0., -100.5, -1.),
         radius: 100.,
         material: Box::new(Lambertian {
             albedo: Color(0.8, 0.8, 0.),
@@ -71,12 +71,12 @@ fn main() {
         }),
     };
     let sphere_left = Sphere {
-        center: Point3(0., -1., -1.),
+        center: Point3(-1., 0., -1.),
         radius: 0.5,
         material: Box::new(Dielectric { ir: 1.5 }),
     };
     let sphere_right = Sphere {
-        center: Point3(0., 1., -1.),
+        center: Point3(1., 0., -1.),
         radius: 0.5,
         material: Box::new(Metal {
             albedo: Color(0.8, 0.6, 0.2),
@@ -100,13 +100,13 @@ fn main() {
     println!("{} {}", IMAGE_WIDTH, IMAGE_HEIGHT);
     println!("255");
 
-    for i in 0..IMAGE_HEIGHT {
-        eprint!("\rLines remaining: {} ", IMAGE_HEIGHT - i);
-        for j in 0..IMAGE_WIDTH {
+    for j in (0..IMAGE_HEIGHT).rev() {
+        eprint!("\rLines remaining: {} ", j + 1);
+        for i in 0..IMAGE_WIDTH {
             let mut color = Color(0., 0., 0.);
             for _ in 0..SAMPLES_PER_PIXEL {
-                let u = (i as f64 + rand::random::<f64>()) / IMAGE_HEIGHT as f64;
-                let v = (j as f64 + rand::random::<f64>()) / IMAGE_WIDTH as f64;
+                let u = (i as f64 + rand::random::<f64>()) / IMAGE_WIDTH as f64;
+                let v = (j as f64 + rand::random::<f64>()) / IMAGE_HEIGHT as f64;
                 let ray = camera.get_ray(u, v);
                 color += ray_color(&ray, &world, MAX_DEPTH);
             }

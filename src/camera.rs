@@ -2,9 +2,9 @@ use crate::vec3::{Point3, Ray, Vec3};
 
 pub struct Camera {
     origin: Point3,
-    upper_left_corner: Point3,
-    vertical: Vec3,
+    lower_left_corner: Point3,
     horizontal: Vec3,
+    vertical: Vec3,
 }
 
 impl Camera {
@@ -15,15 +15,15 @@ impl Camera {
         const FOCAL_LENGTH: f64 = 1.;
 
         let origin = Point3(0., 0., 0.);
-        let vertical = Vec3(VIEWPORT_HEIGHT, 0., 0.);
-        let horizontal = Vec3(0., VIEWPORT_WIDTH, 0.);
-        let upper_left_corner =
+        let horizontal = Vec3(VIEWPORT_WIDTH, 0., 0.);
+        let vertical = Vec3(0., VIEWPORT_HEIGHT, 0.);
+        let lower_left_corner =
             origin + Vec3(0., 0., -FOCAL_LENGTH) - vertical / 2. - horizontal / 2.;
         Camera {
             origin,
-            upper_left_corner,
-            vertical,
+            lower_left_corner,
             horizontal,
+            vertical,
         }
     }
 
@@ -31,9 +31,9 @@ impl Camera {
         Ray {
             origin: self.origin,
             direction: -self.origin
-                + self.upper_left_corner
-                + u * self.vertical
-                + v * self.horizontal,
+                + self.lower_left_corner
+                + u * self.horizontal
+                + v * self.vertical,
         }
     }
 }
