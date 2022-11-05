@@ -79,6 +79,10 @@ impl Vec3 {
         self.0.abs() < EPSILON && self.1.abs() < EPSILON && self.2.abs() < EPSILON
     }
 
+    pub fn near(self, other: Vec3) -> bool {
+        (self - other).near_zero()
+    }
+
     pub fn magnitude(self) -> f64 {
         f64::sqrt(self * self)
     }
@@ -97,6 +101,12 @@ impl Vec3 {
 
     pub fn reflect(self, normal: Vec3) -> Vec3 {
         self - 2. * (self * normal) * normal
+    }
+
+    pub fn refract(self, normal: Vec3, ratio: f64) -> Vec3 {
+        let perpendicular = ratio * (self + (-self * normal) * normal);
+        let parallel = -f64::sqrt(1. - perpendicular * perpendicular) * normal;
+        perpendicular + parallel
     }
 
     pub fn random(min: f64, max: f64) -> Self {

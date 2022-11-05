@@ -2,7 +2,7 @@ extern crate rand;
 
 use crate::camera::Camera;
 use crate::hittable::{Hittable, HittableList, Sphere};
-use crate::material::{Lambertian, Metal};
+use crate::material::{Dielectric, Lambertian, Metal};
 use crate::vec3::{Color, Point3, Ray};
 
 mod camera;
@@ -56,37 +56,39 @@ fn main() {
     const MAX_DEPTH: i32 = 50;
 
     // World
-    let mut world = HittableList { objects: vec![] };
-    world.objects.push(Box::new(Sphere {
+    let sphere_ground = Sphere {
         center: Point3(100.5, 0., -1.),
         radius: 100.,
         material: Box::new(Lambertian {
             albedo: Color(0.8, 0.8, 0.),
         }),
-    }));
-    world.objects.push(Box::new(Sphere {
+    };
+    let sphere_center = Sphere {
         center: Point3(0., 0., -1.),
         radius: 0.5,
-        material: Box::new(Lambertian {
-            albedo: Color(0.7, 0.3, 0.3),
-        }),
-    }));
-    world.objects.push(Box::new(Sphere {
+        material: Box::new(Dielectric { ir: 1.5 }),
+    };
+    let sphere_left = Sphere {
         center: Point3(0., -1., -1.),
         radius: 0.5,
-        material: Box::new(Metal {
-            albedo: Color(0.8, 0.8, 0.8),
-            fuzz: 0.3,
-        }),
-    }));
-    world.objects.push(Box::new(Sphere {
+        material: Box::new(Dielectric { ir: 1.5 }),
+    };
+    let sphere_right = Sphere {
         center: Point3(0., 1., -1.),
         radius: 0.5,
         material: Box::new(Metal {
             albedo: Color(0.8, 0.6, 0.2),
             fuzz: 1.,
         }),
-    }));
+    };
+    let world = HittableList {
+        objects: vec![
+            Box::new(sphere_ground),
+            Box::new(sphere_center),
+            Box::new(sphere_left),
+            Box::new(sphere_right),
+        ],
+    };
 
     // Camera
     let camera = Camera::new();
@@ -117,6 +119,10 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
+    use crate::camera::Camera;
+    use crate::hittable::{HittableList, Sphere};
+    use crate::material::Dielectric;
+    use crate::ray_color;
     use crate::vec3::{Point3, Ray, Vec3};
 
     #[test]
@@ -150,5 +156,39 @@ mod tests {
         let actual = r.at(t);
 
         assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn refract() -> () {
+        assert!(Vec3(1., -f64::sqrt(3.), 0.)
+            .normalize()
+            .refract(Vec3(0., 1., 0.), f64::sqrt(2.))
+            .normalize()
+            .near(Vec3(1., -1., 0.).normalize()));
+        assert!(Vec3(1., -1., 0.)
+            .normalize()
+            .refract(Vec3(0., 1., 0.), f64::sqrt(1. / 2.))
+            .normalize()
+            .near(Vec3(1., -f64::sqrt(3.), 0.).normalize()));
+        assert!(Vec3(f64::sqrt(3.), -1., 0.)
+            .normalize()
+            .refract(Vec3(0., 1., 0.), f64::sqrt(1. / 3.))
+            .normalize()
+            .near(Vec3(1., -f64::sqrt(3.), 0.).normalize()));
+    }
+
+    #[test]
+    fn refract_sphere() -> () {
+        let camera = Camera::new();
+        let ray = camera.get_ray(0.5, 0.5);
+        let sphere = Sphere {
+            center: Point3(0., 0., -2.),
+            radius: 0.5,
+            material: Box::new(Dielectric { ir: 1.5 }),
+        };
+        let world = HittableList {
+            objects: vec![Box::new(sphere)],
+        };
+        ray_color(&ray, &world, 50);
     }
 }

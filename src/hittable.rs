@@ -76,9 +76,9 @@ impl Hittable for Sphere {
             return None;
         }
         let sqrt_determinant = f64::sqrt(determinant);
-        let t = (-half_b - sqrt_determinant) / a;
+        let mut t = (-half_b - sqrt_determinant) / a;
         if !(t_min <= t && t <= t_max) {
-            let t = (-half_b + sqrt_determinant) / a;
+            t = (-half_b + sqrt_determinant) / a;
             if !(t_min <= t && t <= t_max) {
                 return None;
             }
