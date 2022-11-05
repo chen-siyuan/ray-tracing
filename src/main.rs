@@ -2,8 +2,8 @@ extern crate rand;
 
 use crate::camera::Camera;
 use crate::hittable::{Hittable, HittableList, Sphere};
-use crate::material::{Lambertian};
-use crate::vec3::{Color, Point3, Ray};
+use crate::material::{Dielectric, Lambertian, Metal};
+use crate::vec3::{Color, Point3, Ray, Vec3};
 
 mod camera;
 mod hittable;
@@ -56,30 +56,63 @@ fn main() {
     const MAX_DEPTH: i32 = 50;
 
     // World
-    let radius = f64::sqrt(2.) / 2.;
+    let material_ground = Lambertian {
+        albedo: Color(0.8, 0.8, 0.),
+    };
+    let material_center = Lambertian {
+        albedo: Color(0.1, 0.2, 0.5),
+    };
+    let material_left = Dielectric { ir: 1.5 };
+    let material_left_hollow = Dielectric { ir: 1.5 };
+    let material_right = Metal {
+        albedo: Color(0.8, 0.6, 0.2),
+        fuzz: 0.,
+    };
+
+    let sphere_ground = Sphere {
+        center: Point3(0., -100.5, -1.),
+        radius: 100.,
+        material: Box::new(material_ground),
+    };
+    let sphere_center = Sphere {
+        center: Point3(0.0, 0.0, -1.0),
+        radius: 0.5,
+        material: Box::new(material_center),
+    };
     let sphere_left = Sphere {
-        center: Point3(-radius, 0., -1.),
-        radius,
-        material: Box::new(Lambertian {
-            albedo: Color(0., 0., 1.),
-        }),
+        center: Point3(-1.0, 0.0, -1.0),
+        radius: 0.5,
+        material: Box::new(material_left),
+    };
+    let sphere_left_hollow = Sphere {
+        center: Point3(-1.0, 0.0, -1.0),
+        radius: -0.45,
+        material: Box::new(material_left_hollow),
     };
     let sphere_right = Sphere {
-        center: Point3(radius, 0., -1.),
-        radius,
-        material: Box::new(Lambertian {
-            albedo: Color(1., 0., 0.),
-        }),
+        center: Point3(1.0, 0.0, -1.0),
+        radius: 0.5,
+        material: Box::new(material_right),
     };
+
     let world = HittableList {
         objects: vec![
+            Box::new(sphere_ground),
+            Box::new(sphere_center),
             Box::new(sphere_left),
+            Box::new(sphere_left_hollow),
             Box::new(sphere_right),
         ],
     };
 
     // Camera
-    let camera = Camera::new(90., 16. / 9.);
+    let camera = Camera::new(
+        Point3(-2., 2., 1.),
+        Point3(0., 0., -1.),
+        Vec3(0., 1., 0.),
+        20.,
+        ASPECT_RATIO,
+    );
 
     // Render
     println!("P3");
@@ -170,7 +203,13 @@ mod tests {
 
     #[test]
     fn refract_sphere() -> () {
-        let camera = Camera::new(90., 16. / 9.);
+        let camera = Camera::new(
+            Point3(0., 0., 0.),
+            Point3(0., 0., -1.),
+            Vec3(0., 1., 0.),
+            90.,
+            16. / 9.,
+        );
         let ray = camera.get_ray(0.5, 0.5);
         let sphere = Sphere {
             center: Point3(0., 0., -2.),

@@ -100,6 +100,14 @@ impl Vec3 {
         Self(self.0 * other.0, self.1 * other.1, self.2 * other.2)
     }
 
+    pub fn cross(self, other: Vec3) -> Vec3 {
+        Self(
+            self.1 * other.2 - self.2 * other.1,
+            self.2 * other.0 - self.0 * other.2,
+            self.0 * other.1 - self.1 * other.0,
+        )
+    }
+
     pub fn reflect(self, normal: Vec3) -> Vec3 {
         self - 2. * (self * normal) * normal
     }
