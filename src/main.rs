@@ -66,7 +66,9 @@ fn main() {
     let sphere_center = Sphere {
         center: Point3(0., 0., -1.),
         radius: 0.5,
-        material: Box::new(Dielectric { ir: 1.5 }),
+        material: Box::new(Lambertian {
+            albedo: Color(0.1, 0.2, 0.5),
+        }),
     };
     let sphere_left = Sphere {
         center: Point3(0., -1., -1.),
@@ -78,7 +80,7 @@ fn main() {
         radius: 0.5,
         material: Box::new(Metal {
             albedo: Color(0.8, 0.6, 0.2),
-            fuzz: 1.,
+            fuzz: 0.,
         }),
     };
     let world = HittableList {
@@ -163,16 +165,19 @@ mod tests {
         assert!(Vec3(1., -f64::sqrt(3.), 0.)
             .normalize()
             .refract(Vec3(0., 1., 0.), f64::sqrt(2.))
+            .unwrap()
             .normalize()
             .near(Vec3(1., -1., 0.).normalize()));
         assert!(Vec3(1., -1., 0.)
             .normalize()
             .refract(Vec3(0., 1., 0.), f64::sqrt(1. / 2.))
+            .unwrap()
             .normalize()
             .near(Vec3(1., -f64::sqrt(3.), 0.).normalize()));
         assert!(Vec3(f64::sqrt(3.), -1., 0.)
             .normalize()
             .refract(Vec3(0., 1., 0.), f64::sqrt(1. / 3.))
+            .unwrap()
             .normalize()
             .near(Vec3(1., -f64::sqrt(3.), 0.).normalize()));
     }

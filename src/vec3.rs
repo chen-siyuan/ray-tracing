@@ -103,10 +103,17 @@ impl Vec3 {
         self - 2. * (self * normal) * normal
     }
 
-    pub fn refract(self, normal: Vec3, ratio: f64) -> Vec3 {
-        let perpendicular = ratio * (self + (-self * normal) * normal);
-        let parallel = -f64::sqrt(1. - perpendicular * perpendicular) * normal;
-        perpendicular + parallel
+    pub fn refract(self, normal: Vec3, ratio: f64) -> Option<Vec3> {
+        let cos_theta = -self * normal;
+        let sin_theta = f64::sqrt(1. - cos_theta * cos_theta);
+        match ratio * sin_theta > 1. {
+            true => None,
+            false => {
+                let perpendicular = ratio * (self + cos_theta * normal);
+                let parallel = -f64::sqrt(1. - perpendicular * perpendicular) * normal;
+                Some(perpendicular + parallel)
+            }
+        }
     }
 
     pub fn random(min: f64, max: f64) -> Self {

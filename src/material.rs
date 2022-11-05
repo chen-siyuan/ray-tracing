@@ -53,18 +53,21 @@ pub struct Dielectric {
 
 impl Material for Dielectric {
     fn scatter(&self, ray: &Ray, record: &HitRecord) -> Option<(Color, Ray)> {
+        let unit_direction = ray.direction.normalize();
+        let ratio = if record.front_face {
+            1. / self.ir
+        } else {
+            self.ir
+        };
+        let direction = match unit_direction.refract(record.normal, ratio) {
+            Some(direction) => direction,
+            None => unit_direction.reflect(record.normal),
+        };
         Some((
             Color(1., 1., 1.),
             Ray {
                 origin: record.point,
-                direction: ray.direction.normalize().refract(
-                    record.normal,
-                    if record.front_face {
-                        1. / self.ir
-                    } else {
-                        self.ir
-                    },
-                ),
+                direction,
             },
         ))
     }
