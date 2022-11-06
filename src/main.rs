@@ -2,7 +2,7 @@ extern crate rand;
 
 use crate::camera::Camera;
 use crate::hittable::{Hittable, HittableList, Sphere};
-use crate::material::{Dielectric, Lambertian, Metal};
+use crate::material::{Dielectric, Lambertian, Material, Metal};
 use crate::vec3::{Color, Ray, Vec3};
 
 mod camera;
@@ -31,7 +31,7 @@ fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
     }
 }
 
-pub fn write_color(color: &Color) -> () {
+fn write_color(color: &Color) -> () {
     const MAX_COLOR: f64 = 255.999;
 
     let Color(r, g, b) = color;
@@ -47,70 +47,88 @@ pub fn write_color(color: &Color) -> () {
     println!("{} {} {}", ir, ig, ib);
 }
 
+fn random_world() -> HittableList {
+    let mut world = HittableList { objects: vec![] };
+
+    world.objects.push(Box::new(Sphere {
+        center: Vec3(0., -1000., 0.),
+        radius: 1000.,
+        material: Box::new(Lambertian {
+            albedo: Color(0.5, 0.5, 0.5),
+        }),
+    }));
+
+    for i in -11..11 {
+        for j in -11..11 {
+            let rand_material = rand::random::<f64>();
+            let center = Vec3(
+                i as f64 + 0.9 * rand::random::<f64>(),
+                0.2,
+                j as f64 + 0.9 * rand::random::<f64>(),
+            );
+            if (center - Vec3(4., 0.2, 0.)).magnitude() > 0.9 {
+                let material: Box<dyn Material> = if rand_material < 0.8 {
+                    Box::new(Lambertian {
+                        albedo: Color::random(0., 1.).mul(Color::random(0., 1.)),
+                    })
+                } else if rand_material < 0.95 {
+                    Box::new(Metal {
+                        albedo: Color::random(0.5, 1.),
+                        fuzz: rand::random::<f64>() / 2.,
+                    })
+                } else {
+                    Box::new(Dielectric { ir: 1.5 })
+                };
+                world.objects.push(Box::new(Sphere {
+                    center,
+                    radius: 0.2,
+                    material,
+                }));
+            }
+        }
+    }
+
+    world.objects.push(Box::new(Sphere {
+        center: Vec3(0., 1., 0.),
+        radius: 1.,
+        material: Box::new(Dielectric { ir: 1.5 }),
+    }));
+    world.objects.push(Box::new(Sphere {
+        center: Vec3(-4., 1., 0.),
+        radius: 1.,
+        material: Box::new(Lambertian {
+            albedo: Color(0.4, 0.2, 0.1),
+        }),
+    }));
+    world.objects.push(Box::new(Sphere {
+        center: Vec3(4., 1., 0.),
+        radius: 1.,
+        material: Box::new(Metal {
+            albedo: Color(0.7, 0.6, 0.5),
+            fuzz: 0.,
+        }),
+    }));
+
+    world
+}
+
 fn main() {
     // Image
-    const ASPECT_RATIO: f64 = 16. / 9.;
-    const IMAGE_HEIGHT: i32 = 400;
+    const ASPECT_RATIO: f64 = 3. / 2.;
+    const IMAGE_HEIGHT: i32 = 1200;
     const IMAGE_WIDTH: i32 = (ASPECT_RATIO * IMAGE_HEIGHT as f64) as i32;
-    const SAMPLES_PER_PIXEL: i32 = 100;
+    const SAMPLES_PER_PIXEL: i32 = 500;
     const MAX_DEPTH: i32 = 50;
 
     // World
-    let material_ground = Lambertian {
-        albedo: Color(0.8, 0.8, 0.),
-    };
-    let material_center = Lambertian {
-        albedo: Color(0.1, 0.2, 0.5),
-    };
-    let material_left = Dielectric { ir: 1.5 };
-    let material_left_hollow = Dielectric { ir: 1.5 };
-    let material_right = Metal {
-        albedo: Color(0.8, 0.6, 0.2),
-        fuzz: 0.,
-    };
-
-    let sphere_ground = Sphere {
-        center: Vec3(0., -100.5, -1.),
-        radius: 100.,
-        material: Box::new(material_ground),
-    };
-    let sphere_center = Sphere {
-        center: Vec3(0.0, 0.0, -1.0),
-        radius: 0.5,
-        material: Box::new(material_center),
-    };
-    let sphere_left = Sphere {
-        center: Vec3(-1.0, 0.0, -1.0),
-        radius: 0.5,
-        material: Box::new(material_left),
-    };
-    let sphere_left_hollow = Sphere {
-        center: Vec3(-1.0, 0.0, -1.0),
-        radius: -0.45,
-        material: Box::new(material_left_hollow),
-    };
-    let sphere_right = Sphere {
-        center: Vec3(1.0, 0.0, -1.0),
-        radius: 0.5,
-        material: Box::new(material_right),
-    };
-
-    let world = HittableList {
-        objects: vec![
-            Box::new(sphere_ground),
-            Box::new(sphere_center),
-            Box::new(sphere_left),
-            Box::new(sphere_left_hollow),
-            Box::new(sphere_right),
-        ],
-    };
+    let world = random_world();
 
     // Camera
-    let from = Vec3(3., 3., 2.);
-    let at = Vec3(0., 0., -1.);
+    let from = Vec3(13., 2., 3.);
+    let at = Vec3(0., 0., 0.);
     let vup = Vec3(0., 1., 0.);
-    let aperture = 2.;
-    let dist_to_focus = (from - at).magnitude();
+    let aperture = 0.1;
+    let dist_to_focus = 10.;
     let camera = Camera::new(from, at, vup, 20., ASPECT_RATIO, aperture, dist_to_focus);
 
     // Render
