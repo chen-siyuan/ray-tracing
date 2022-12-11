@@ -10,7 +10,7 @@ mod hittable;
 mod material;
 mod vec3;
 
-fn ray_color(ray: &Ray, world: &HittableList, depth: i32) -> Color {
+fn ray_color(ray: &Ray, world: &dyn Hittable, depth: i32) -> Color {
     const EPSILON: f64 = 0.001;
     const INFINITY: f64 = f64::MAX;
 
